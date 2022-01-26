@@ -25,9 +25,7 @@ from .helpers import (
     make_keyboard,
 )
 
-CANCEL_CALLBACK = (
-    "cancel_callback",
-)
+CANCEL_CALLBACK = "cancel_callback"
 
 KIND_CREDENTIALS = "credentials"
 
