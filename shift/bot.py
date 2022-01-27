@@ -1,6 +1,5 @@
 import datetime
 import logging
-import os
 import re
 
 from telegram import Update
@@ -16,7 +15,6 @@ from telegram.ext import (
 
 from . import notifications
 from . import shiftsheduling
-
 from .constants import *
 from .helpers import (
     admin_user,
