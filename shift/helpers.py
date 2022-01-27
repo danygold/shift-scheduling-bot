@@ -53,7 +53,7 @@ def logged_user(func):
         if context.user_data.get(LOGGED):
             func(*args, **kwargs)
         else:
-            message = "Devi prima loggarti per utilizzare questo comando! ⛔"
+            message = "Devi prima comunicare il tuo gruppo per utilizzare questo comando! ⛔"
             keyboard = make_keyboard(("Login", LOGIN_CALLBACK), context)
             if update.callback_query:
                 update.callback_query.answer()

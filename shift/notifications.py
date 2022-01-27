@@ -152,6 +152,8 @@ def add_callback(update: Update, context: CallbackContext):
 def choose_days(update: Update, context: CallbackContext):
     tmp_notification = context.user_data[TMP_NOTIFICATION]
 
+    current = None
+
     callback_data = update.callback_query.data[: update.callback_query.data.index("#")]
     if callback_data == REMIND_SMART_CALLBACK:
         tmp_notification[SHIFT_TYPE] = "Smart"
