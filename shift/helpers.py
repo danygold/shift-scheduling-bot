@@ -65,6 +65,38 @@ def logged_user(func):
     return wrapper
 
 
+def valid_user(func):
+    def wrapper(*args, **kwargs):
+        update, context = args[0], args[1]
+
+        users = os.getenv("USERS")
+
+        if not users:
+            return
+
+        if not str(update.message.from_user.id) in users:
+            logger.warning(
+                "User %s (%s) try to use a restricted command",
+                update.effective_user.id,
+                update.effective_user.first_name,
+            )
+
+            message = ("Il tuo utente non risulta abilitato all'utilizzo di questo comando\n\n"
+                       f"Se devi effettivamente utilizzare {BOT_NAME} Contatta gli amministratori per farti abilitare")
+
+            if update.callback_query:
+                update.callback_query.answer()
+                update.callback_query.edit_message_text(text=message)
+            else:
+                update.message.reply_text(text=message)
+
+            return
+
+        func(*args, **kwargs)
+
+    return wrapper
+
+
 def admin_user(func):
     def wrapper(*args, **kwargs):
         update = args[0]
@@ -74,6 +106,11 @@ def admin_user(func):
             return
 
         if not str(update.message.from_user.id) in admins:
+            logger.warning(
+                "User %s (%s) try to use an admin command",
+                update.effective_user.id,
+                update.effective_user.first_name,
+            )
             return
 
         func(*args, **kwargs)

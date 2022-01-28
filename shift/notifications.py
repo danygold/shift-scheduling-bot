@@ -1,6 +1,7 @@
 import logging
 import re
 from datetime import datetime
+from enum import Enum
 from typing import Tuple
 
 from dateutil import tz
@@ -9,6 +10,7 @@ from telegram.ext import CallbackContext, CallbackQueryHandler
 from telegram.ext.updater import Updater
 
 from .constants import *
+from .datehelper import DAYS_OF_WEEK
 from .helpers import callback, callback_pattern, logged_user, make_keyboard
 
 (
@@ -35,21 +37,18 @@ TMP_NOTIFICATION = "tmp_notification"
 KIND_NOTIFICATION_INDEX = "notification_index"
 KIND_NOTIFICATION_TIME = "notification_time"
 
-DAYS_OF_WEEK = {
-    0: "lunedì",
-    1: "martedì",
-    2: "mercoledì",
-    3: "giovedì",
-    4: "venerdì",
-    5: "Sabato",
-    6: "Domenica",
-}
-
 SHIFT_TYPE, WHEN_DAYS, WHEN_TIME = "shift_type", "when_days", "when_time"
+
+BOT_TAG, USER_ID_TAG, USER_DATA_TAG, SCHEDULE_DATA_TAG = "bot", "user_id", "user_data", "schedule_data"
 
 logger = logging.getLogger(__name__)
 
 notification_jobs = dict()
+
+
+class ShiftType(Enum):
+    SMART_WORKING = 1
+    PRESENCE = 2
 
 
 @logged_user
@@ -63,9 +62,7 @@ def main_menu(update: Update, context: CallbackContext):
     buttons.append(("Aggiungi 🔔", NOTIFICATION_ADD_CALLBACK))
     keyboard = make_keyboard([buttons], context)
 
-    message = (
-        "Attraverso le notifiche ti posso avvertire sui turni che dovrai effettuare 🚨"
-    )
+    message = "Attraverso le notifiche ti posso avvertire sui turni che dovrai effettuare 🚨"
 
     if update.message:
         update.message.reply_text(text=message, reply_markup=keyboard)
@@ -139,11 +136,12 @@ def add_callback(update: Update, context: CallbackContext):
 
     buttons = [
         ("Indietro", NOTIFICATION_BACK_CALLBACK),
-        ("Smart ➡️", REMIND_SMART_CALLBACK),
-        ("Ufficio ⬅️", REMIND_OFFICE_CALLBACK),
+        ("Smart ️🏠", REMIND_SMART_CALLBACK),
+        ("Ufficio 💼️", REMIND_OFFICE_CALLBACK),
     ]
     update.callback_query.edit_message_text(
-        "Scegli il tipo di notifica da aggiungere 📢",
+        "Scegli il tipo di notifica da aggiungere 📢"
+        "Attenzione ⚠ La notifica verrà mandata solo se il giorno successivo sarai in Smart o Ufficio, a seconda del tipo selezionato",
         reply_markup=make_keyboard([buttons], context),
     )
 
@@ -156,11 +154,11 @@ def choose_days(update: Update, context: CallbackContext):
 
     callback_data = update.callback_query.data[: update.callback_query.data.index("#")]
     if callback_data == REMIND_SMART_CALLBACK:
-        tmp_notification[SHIFT_TYPE] = "Smart"
-        tmp_notification[WHEN_TIME] = "9:15"
+        tmp_notification[SHIFT_TYPE] = ShiftType.SMART_WORKING
+        tmp_notification[WHEN_TIME] = "19:00"
     elif callback_data == REMIND_OFFICE_CALLBACK:
-        tmp_notification[SHIFT_TYPE] = "Ufficio"
-        tmp_notification[WHEN_TIME] = "18:15"
+        tmp_notification[SHIFT_TYPE] = ShiftType.SMART_WORKING
+        tmp_notification[WHEN_TIME] = "18:00"
     elif callback_data in DAYS_OF_WEEK.values():
         when_days = tmp_notification[WHEN_DAYS]
         for index, name in DAYS_OF_WEEK.items():
@@ -224,10 +222,10 @@ def choose_time_wrapper(shift_reminder_callback):
                 time=job_time(schedule_data[WHEN_TIME]),
                 days=schedule_data[WHEN_DAYS],
                 context={
-                    "bot": context.bot,
-                    "user_id": user_id,
-                    "user_data": context.user_data,
-                    "schedule_data": schedule_data,
+                    BOT_TAG: context.bot,
+                    USER_ID_TAG: user_id,
+                    USER_DATA_TAG: context.user_data,
+                    SCHEDULE_DATA_TAG: schedule_data,
                 },
             )
 
@@ -260,10 +258,10 @@ def setup_scheduler(updater: Updater, shift_reminder_callback):
                     time=job_time(schedule_data[WHEN_TIME]),
                     days=schedule_data[WHEN_DAYS],
                     context={
-                        "bot": updater.bot,
-                        "user_id": user_id,
-                        "user_data": user_values,
-                        "schedule_data": schedule_data,
+                        BOT_TAG: updater.bot,
+                        USER_ID_TAG: user_id,
+                        USER_DATA_TAG: user_values,
+                        SCHEDULE_DATA_TAG: schedule_data,
                     },
                 )
 

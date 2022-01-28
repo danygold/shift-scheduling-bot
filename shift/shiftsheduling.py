@@ -2,16 +2,7 @@ import datetime
 import json
 
 from .constants import USER_GROUP
-
-DAYS_OF_WEEK = {
-    0: "Lunedì",
-    1: "Martedì",
-    2: "Mercoledì",
-    3: "Giovedì",
-    4: "Venerdì",
-    5: "Sabato",
-    6: "Domenica",
-}
+from .datehelper import DAYS_OF_WEEK
 
 shifts_dict = dict()
 
@@ -39,9 +30,9 @@ def get_group():
 
 def get_decoded_description(presence: bool):
     if presence:
-        return "Ufficio"
+        return "Ufficio 💼"
     else:
-        return "Smart working"
+        return "Smart working 🏠"
 
 
 def get_current_week_message(date: datetime, user_data: dict):
@@ -53,7 +44,7 @@ def get_current_week_message(date: datetime, user_data: dict):
         try:
             message = message + f"{get_decoded_description(shifts_dict[user_data[USER_GROUP]][date_string])} \n"
         except:
-            message = message + "Nessun turno \n"
+            message = message + "Nessun turno 😢\n"
 
     return message
 
