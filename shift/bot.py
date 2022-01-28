@@ -46,7 +46,7 @@ shift_users = dict()
 @command
 def start_command(update: Update, context: CallbackContext):
     update.message.reply_text(
-        f"Ciao! Io sono {BOT_NAME}! Con me potrai capire i tuoi turni di presenza senza dover aprire aprire ogni volta email, excel o altri strumenti ormai obsoleti \n\n "
+        f"Ciao! Io sono {BOT_NAME}! Con me potrai capire i tuoi turni di presenza senza dover aprire aprire ogni volta email, excel o altri strumenti ormai obsoleti \n\n"
         "Ma prima di iniziare devi effettuare il login, digitando il tuo codice gruppo!",
         reply_markup=make_keyboard(("Login", LOGIN_CALLBACK), context),
     )
@@ -60,12 +60,12 @@ def login_command(update: Update, context: CallbackContext):
 
 
 @callback
-@valid_user
 def login_callback(update: Update, context: CallbackContext):
     context.user_data[INPUT_KIND] = KIND_CREDENTIALS
     update.callback_query.edit_message_text(LOGIN_MESSAGE)
 
 
+@valid_user
 def credentials_input(update: Update, context: CallbackContext):
     match = re.match(r"[\d]+", update.message.text)
     if not match:

@@ -74,11 +74,11 @@ def valid_user(func):
         if not users:
             return
 
-        if not str(update.message.from_user.id) in users:
+        if not "\"" + str(update.message.from_user.id) + "\"" in users:
             logger.warning(
                 "User %s (%s) try to use a restricted command",
                 update.effective_user.id,
-                update.effective_user.first_name,
+                update.effective_user.full_name,
             )
 
             message = ("Il tuo utente non risulta abilitato all'utilizzo di questo comando\n\n"
@@ -105,11 +105,11 @@ def admin_user(func):
         if not admins:
             return
 
-        if not str(update.message.from_user.id) in admins:
+        if not "\"" + str(update.message.from_user.id) + "\"" in admins:
             logger.warning(
                 "User %s (%s) try to use an admin command",
                 update.effective_user.id,
-                update.effective_user.first_name,
+                update.effective_user.full_name,
             )
             return
 
