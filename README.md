@@ -9,7 +9,8 @@ A Telegram bot that can be used to manage shift scheduling.
 
 ## Commands
 
-- `/login`: saves the username to identify user in the platform
-- `/turni`: checks the shift scheduling
+- `/login`: saves the group code to identify user group code in the platform
+- `/turni`: checks the shifts scheduling
+- `/domani`: return the shifts of the next working day
 - `/notifiche`: allows the user to configure notifications
 - `/messaggio`: allows admin users to send a message to all users of the bot
