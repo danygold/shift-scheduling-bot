@@ -1,3 +1,7 @@
+"""
+Helper module
+"""
+
 import logging
 import re
 import uuid
@@ -13,6 +17,13 @@ logger = logging.getLogger(__name__)
 
 
 def make_keyboard(buttons, context: CallbackContext = None, user_data: dict = None):
+    """
+    Create inline keyboard markup
+    :param buttons: buttons to add (Supported type are List of Tuple)
+    :param context: context
+    :param user_data: user_data
+    :return: inline keyboard markup
+    """
     keyboard = []
 
     session = str(uuid.uuid4())
@@ -46,7 +57,18 @@ def make_keyboard(buttons, context: CallbackContext = None, user_data: dict = No
 
 
 def logged_user(func):
+    """
+    Logged user checks
+    :param func: func
+    :return: wrapper
+    """
+
     def wrapper(*args, **kwargs):
+        """
+        Effective checks
+        :param args: args
+        :param kwargs: kwargs
+        """
         update, context = args[0], args[1]
 
         if context.user_data.get(LOGGED):
@@ -66,7 +88,18 @@ def logged_user(func):
 
 
 def valid_user(func):
+    """
+    Valid user checks
+    :param func: func
+    :return: wrapper
+    """
+
     def wrapper(*args, **kwargs):
+        """
+        Effective checks
+        :param args: args
+        :param kwargs: kwargs
+        """
         update, context = args[0], args[1]
 
         users = os.getenv("USERS")
@@ -98,7 +131,18 @@ def valid_user(func):
 
 
 def admin_user(func):
+    """
+    Admin user checks
+    :param func: func
+    :return: wrapper
+    """
+
     def wrapper(*args, **kwargs):
+        """
+        Effective checks
+        :param args: args
+        :param kwargs: kwargs
+        """
         update = args[0]
 
         admins = os.getenv("ADMIN_USERS")
@@ -119,7 +163,18 @@ def admin_user(func):
 
 
 def callback(func):
+    """
+    Callback preliminary checks
+    :param func: func
+    :return: wrapper
+    """
+
     def wrapper(*args, **kwargs):
+        """
+        Effective checks
+        :param args: args
+        :param kwargs: kwargs
+        """
         update, context = args[0], args[1]
 
         if not update.callback_query:
@@ -142,12 +197,19 @@ def callback(func):
     return wrapper
 
 
-def callback_pattern(key):
-    return "^" + key + "#[\w-]+$"
-
-
 def command(func):
+    """
+    Command preliminary checks
+    :param func: func
+    :return: wrapper
+    """
+
     def wrapper(*args, **kwargs):
+        """
+        Effective checks
+        :param args: args
+        :param kwargs: kwargs
+        """
         context = args[1]
 
         context.user_data[INPUT_KIND] = None
@@ -155,3 +217,12 @@ def command(func):
         func(*args, **kwargs)
 
     return wrapper
+
+
+def callback_pattern(key):
+    """
+    Callback pattern
+    :param key: key to use
+    :return: callback pattern
+    """
+    return "^" + key + "#[\w-]+$"

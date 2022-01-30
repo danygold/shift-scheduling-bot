@@ -1,3 +1,7 @@
+"""
+This module contains the bot main commands
+"""
+
 import datetime
 import logging
 import re
@@ -45,6 +49,11 @@ shift_users = dict()
 
 @command
 def start_command(update: Update, context: CallbackContext):
+    """
+    Manage the /start command
+    :param update: update
+    :param context: context
+    """
     update.message.reply_text(
         f"Ciao! Io sono {get_bot_name()}! Con me potrai capire i tuoi turni di presenza senza dover aprire aprire ogni "
         "volta email, excel o altri strumenti ormai obsoleti \n\n"
@@ -56,18 +65,33 @@ def start_command(update: Update, context: CallbackContext):
 @command
 @valid_user
 def login_command(update: Update, context: CallbackContext):
+    """
+    Manage the /login command
+    :param update: update
+    :param context: context
+    """
     context.user_data[INPUT_KIND] = KIND_CREDENTIALS
     update.message.reply_text(LOGIN_MESSAGE)
 
 
 @callback
 def login_callback(update: Update, context: CallbackContext):
+    """
+    Login callback action
+    :param update: update
+    :param context: context
+    """
     context.user_data[INPUT_KIND] = KIND_CREDENTIALS
     update.callback_query.edit_message_text(LOGIN_MESSAGE)
 
 
 @valid_user
 def credentials_input(update: Update, context: CallbackContext):
+    """
+    Login input validation
+    :param update: update
+    :param context: context
+    """
     match = re.match(r"[\d]+", update.message.text)
     if not match:
         update.message.reply_markdown(
@@ -104,6 +128,11 @@ def credentials_input(update: Update, context: CallbackContext):
 
 
 def user_input(update: Update, context: CallbackContext):
+    """
+    User input management
+    :param update: update
+    :param context: context
+    """
     input_kinds = [
                       (KIND_CREDENTIALS, credentials_input)
                   ] + notifications.user_input_handlers(shift_reminder)
@@ -115,7 +144,14 @@ def user_input(update: Update, context: CallbackContext):
             return
 
 
-def get_shift_user(update: Update, context: CallbackContext):
+def get_user_group(update: Update, context: CallbackContext):
+    """
+    Gets the user group.
+    If not user group is found, return login callback
+    :param update: update
+    :param context: context
+    :return: founded group, or None in negative case
+    """
     shift_user = context.user_data[USER_GROUP]
 
     if not shift_user:
@@ -137,8 +173,13 @@ def get_shift_user(update: Update, context: CallbackContext):
 @valid_user
 @logged_user
 def shift_command(update: Update, context: CallbackContext):
-    shift_user = get_shift_user(update, context)
-    if not shift_user:
+    """
+    Manage /turni command
+    :param update: update
+    :param context: context
+    """
+    user_group = get_user_group(update, context)
+    if not user_group:
         context.user_data[LOGGED] = False
         context.user_data[USER_GROUP] = None
         return
@@ -157,8 +198,13 @@ def shift_command(update: Update, context: CallbackContext):
 @valid_user
 @logged_user
 def tomorrow_command(update: Update, context: CallbackContext):
-    shift_user = get_shift_user(update, context)
-    if not shift_user:
+    """
+    Manage /domani command
+    :param update: update
+    :param context: context
+    """
+    user_group = get_user_group(update, context)
+    if not user_group:
         context.user_data[LOGGED] = False
         context.user_data[USER_GROUP] = None
         return
@@ -185,13 +231,19 @@ def tomorrow_command(update: Update, context: CallbackContext):
 
 
 def shifts(update: Update, context: CallbackContext, date: datetime):
+    """
+    Shifts command text
+    :param update: update
+    :param context: context
+    :param date: compare date
+    """
     buttons = [
         ("️⬅️ Precedente", SHIFTS_PREVIOUS_CALLBACK),
         ("Successivo ➡", SHIFTS_NEXT_CALLBACK),
     ]
 
-    message = "Ecco i turni della settimana \n\n" + shiftsheduling.get_current_week_message(date,
-                                                                                            context.user_data)
+    message = "Ecco i turni della settimana \n\n" + shiftsheduling.get_week_shifts_message(date,
+                                                                                           context.user_data)
 
     if update.message:
         update.message.reply_text(text=message, reply_markup=make_keyboard([buttons], context))
@@ -202,11 +254,22 @@ def shifts(update: Update, context: CallbackContext, date: datetime):
 # noinspection PyUnusedLocal
 @callback
 def cancel_callback(update: Update, context: CallbackContext):
+    """
+    Cancel callback
+    :param update: update
+    :param context: context
+    """
     update.callback_query.delete_message()
 
 
 @callback
 def previous_shifts_callback(update: Update, context: CallbackContext):
+    """
+    Previous shifts' callback.
+    Method remove 1 week from last /turni command
+    :param update: update
+    :param context: context
+    """
     context.user_data[SHIFTS_DATE] = context.user_data[SHIFTS_DATE] - datetime.timedelta(weeks=1)
 
     shifts(update, context, context.user_data[SHIFTS_DATE])
@@ -214,6 +277,12 @@ def previous_shifts_callback(update: Update, context: CallbackContext):
 
 @callback
 def next_shifts_callback(update: Update, context: CallbackContext):
+    """
+    Next shifts' callback
+    Method add 1 week from last /turni command
+    :param update: update
+    :param context: context
+    """
     context.user_data[SHIFTS_DATE] = context.user_data[SHIFTS_DATE] + datetime.timedelta(weeks=1)
 
     shifts(update, context, context.user_data[SHIFTS_DATE])
@@ -222,6 +291,11 @@ def next_shifts_callback(update: Update, context: CallbackContext):
 @command
 @admin_user
 def message_command(update: Update, context: CallbackContext):
+    """
+    Manage /message command
+    :param update: update
+    :param context: context
+    """
     message = re.sub("^/messaggio", "", update.message.text).strip()
     if message == "":
         return
@@ -233,6 +307,10 @@ def message_command(update: Update, context: CallbackContext):
 
 
 def shift_reminder(context) -> None:
+    """
+    Manage the shift reminder
+    :param context: context
+    """
     bot = context.job.context[notifications.BOT_TAG]
     user_id = context.job.context[notifications.USER_ID_TAG]
     user_data = context.job.context[notifications.USER_DATA_TAG]
@@ -280,10 +358,19 @@ def shift_reminder(context) -> None:
 
 @command
 def notification_command(update: Update, context: CallbackContext):
+    """
+    Manage /notifiche command
+    :param update: update
+    :param context: context
+    """
     notifications.main_menu(update, context)
 
 
 def run() -> None:
+    """
+    Run method.
+    Start bot and add all command handler
+    """
     data_dir = os.getenv("DATA_DIR") or os.getcwd()
     persistence = PicklePersistence(filename=os.path.join(data_dir, DB_NAME))
     updater = Updater(os.getenv("TELEGRAM_TOKEN"), persistence=persistence)

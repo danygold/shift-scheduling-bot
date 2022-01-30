@@ -1,3 +1,7 @@
+"""
+Notification module
+"""
+
 import logging
 import re
 from datetime import datetime
@@ -48,12 +52,20 @@ notification_jobs = dict()
 
 
 class ShiftType(Enum):
+    """
+    Shift type
+    """
     SMART_WORKING = 0
     PRESENCE = 1
 
 
 @logged_user
 def main_menu(update: Update, context: CallbackContext):
+    """
+    Notification main menu
+    :param update: update
+    :param context: context
+    """
     shift_reminders = context.user_data.get(SHIFT_REMINDERS)
     buttons = [("Indietro", NOTIFICATION_EXIT_CALLBACK)]
 
@@ -74,16 +86,32 @@ def main_menu(update: Update, context: CallbackContext):
 # noinspection PyUnusedLocal
 @callback
 def exit_callback(update: Update, context: CallbackContext):
+    """
+    Exit callback
+    :param update: update
+    :param context: context
+    """
     update.callback_query.delete_message()
 
 
 @callback
 def back_callback(update: Update, context: CallbackContext):
+    """
+    Back callback
+    :param update: update
+    :param context: context
+    """
     main_menu(update, context)
 
 
 @callback
 def remove_callback(update: Update, context: CallbackContext):
+    """
+    Remove callback.
+    This callback enables user to remove a specific notification
+    :param update: update
+    :param context: context
+    """
     shift_reminders = context.user_data.get(SHIFT_REMINDERS)
 
     message = "Invia il numero della notifica da rimuovere ✍🏽\n\n"
@@ -104,6 +132,12 @@ def remove_callback(update: Update, context: CallbackContext):
 
 
 def remove_action(update: Update, context: CallbackContext):
+    """
+    Manage remove action.
+    This method allow remove of a specific notification
+    :param update: update
+    :param context: context
+    """
     try:
         index = int(update.message.text.strip())
         index -= 1
@@ -134,6 +168,12 @@ def remove_action(update: Update, context: CallbackContext):
 
 @callback
 def add_callback(update: Update, context: CallbackContext):
+    """
+    Add callback.
+    This callback enables user to add a notification
+    :param update: update
+    :param context: context
+    """
     context.user_data[TMP_NOTIFICATION] = {WHEN_DAYS: [0, 1, 2, 3, 4]}
 
     buttons = [
@@ -151,6 +191,12 @@ def add_callback(update: Update, context: CallbackContext):
 
 @callback
 def choose_days(update: Update, context: CallbackContext):
+    """
+    Choose days callback.
+    This method permits user to choose notification days
+    :param update: update
+    :param context: context
+    """
     tmp_notification = context.user_data[TMP_NOTIFICATION]
 
     current = None
@@ -195,8 +241,19 @@ def choose_days(update: Update, context: CallbackContext):
 
 
 def choose_time_wrapper(shift_reminder_callback):
+    """
+    Choose time wrapper
+    :param shift_reminder_callback: shift reminder callback
+    :return: wrapper
+    """
+
     @callback
     def choose_time(update: Update, context: CallbackContext):
+        """
+        Choose time
+        :param update: update
+        :param context: context
+        """
         keyboard = make_keyboard(("Indietro", NOTIFICATION_BACK_CALLBACK), context)
 
         if update.callback_query:
@@ -253,6 +310,11 @@ def choose_time_wrapper(shift_reminder_callback):
 
 
 def setup_scheduler(updater: Updater, shift_reminder_callback):
+    """
+    Setup notification scheduler
+    :param updater: updater
+    :param shift_reminder_callback: shift reminder callback
+    """
     for user_id, user_values in updater.dispatcher.user_data.items():
         if SHIFT_REMINDERS in user_values:
             for schedule_data in user_values[SHIFT_REMINDERS]:
@@ -274,6 +336,11 @@ def setup_scheduler(updater: Updater, shift_reminder_callback):
 
 
 def handlers(shift_reminder_callback):
+    """
+    Define the notifications handlers
+    :param shift_reminder_callback: shift reminder callback
+    :return: notifications handlers
+    """
     choose_time_handler = choose_time_wrapper(shift_reminder_callback)
 
     return [
@@ -302,6 +369,11 @@ def handlers(shift_reminder_callback):
 
 
 def user_input_handlers(shift_reminder_callback):
+    """
+    User input handlers
+    :param shift_reminder_callback: shift reminder callback
+    :return: the user input handlers
+    """
     choose_time_handler = choose_time_wrapper(shift_reminder_callback)
 
     return [
@@ -311,6 +383,11 @@ def user_input_handlers(shift_reminder_callback):
 
 
 def notification_key(notification: dict) -> Tuple:
+    """
+    Gets the notification key
+    :param notification: notification dict
+    :return: the notifications key
+    """
     return (
         notification[SHIFT_TYPE],
         ",".join([str(d) for d in notification[WHEN_DAYS]]),
@@ -319,6 +396,11 @@ def notification_key(notification: dict) -> Tuple:
 
 
 def job_time(time):
+    """
+    Manage the time user input, and return the UTF corresponding time
+    :param time: user time
+    :return: normalized time
+    """
     return (datetime.strptime(datetime.now().strftime("%Y-%m-%d") + " " + time, "%Y-%m-%d %H:%M").replace(
         tzinfo=tz.gettz('Europe/Rome')).astimezone(tz.gettz('UTC')).time()
             )

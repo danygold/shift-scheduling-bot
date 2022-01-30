@@ -1,3 +1,7 @@
+"""
+This module is the entry point of application
+"""
+
 import logging
 import os
 import sys
@@ -15,6 +19,14 @@ logger = logging.getLogger(__name__)
 
 
 def main():
+    """
+    Main method of application.
+
+    This method check required env variable.
+
+    :return: True if preliminary checks is satisfied, False otherwise
+    """
+
     if not load_dotenv():
         logger.debug("Failed to load environment variables from .env file")
 
