@@ -82,7 +82,7 @@ def valid_user(func):
             )
 
             message = ("Il tuo utente non risulta abilitato all'utilizzo di questo comando\n\n"
-                       f"Se devi effettivamente utilizzare {BOT_NAME} Contatta gli amministratori per farti abilitare")
+                       f"Se devi effettivamente utilizzare {get_bot_name()} contatta gli amministratori di sistema")
 
             if update.callback_query:
                 update.callback_query.answer()
