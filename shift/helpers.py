@@ -12,7 +12,7 @@ CALLBACK_SESSION = "callback_session"
 logger = logging.getLogger(__name__)
 
 
-def make_keyboard(buttons: list, context: CallbackContext = None, user_data: dict = None):
+def make_keyboard(buttons, context: CallbackContext = None, user_data: dict = None):
     keyboard = []
 
     session = str(uuid.uuid4())

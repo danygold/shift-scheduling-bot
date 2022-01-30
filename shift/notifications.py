@@ -9,6 +9,7 @@ from telegram import Update
 from telegram.ext import CallbackContext, CallbackQueryHandler
 from telegram.ext.updater import Updater
 
+from . import shiftsheduling
 from .constants import *
 from .datehelper import DAYS_OF_WEEK
 from .helpers import callback, callback_pattern, logged_user, make_keyboard
@@ -47,8 +48,8 @@ notification_jobs = dict()
 
 
 class ShiftType(Enum):
-    SMART_WORKING = 1
-    PRESENCE = 2
+    SMART_WORKING = 0
+    PRESENCE = 1
 
 
 @logged_user
@@ -70,6 +71,7 @@ def main_menu(update: Update, context: CallbackContext):
         update.callback_query.edit_message_text(text=message, reply_markup=keyboard)
 
 
+# noinspection PyUnusedLocal
 @callback
 def exit_callback(update: Update, context: CallbackContext):
     update.callback_query.delete_message()
@@ -87,7 +89,7 @@ def remove_callback(update: Update, context: CallbackContext):
     message = "Invia il numero della notifica da rimuovere ✍🏽\n\n"
 
     for i in range(len(shift_reminders)):
-        shift_type = shift_reminders[i][SHIFT_TYPE]
+        shift_type = shiftsheduling.get_decoded_description(shift_reminders[i][SHIFT_TYPE] is ShiftType.PRESENCE)
         when_time = shift_reminders[i][WHEN_TIME]
         when_days = ",".join(
             [DAYS_OF_WEEK[d][:3] for d in shift_reminders[i][WHEN_DAYS]]
@@ -105,7 +107,7 @@ def remove_action(update: Update, context: CallbackContext):
     try:
         index = int(update.message.text.strip())
         index -= 1
-    except:
+    except ValueError:
         update.message.reply_text(
             text="Devi inserire il numero della notifica da rimuovere 🔢"
         )
@@ -140,8 +142,9 @@ def add_callback(update: Update, context: CallbackContext):
         ("Ufficio 💼️", REMIND_OFFICE_CALLBACK),
     ]
     update.callback_query.edit_message_text(
-        "Scegli il tipo di notifica da aggiungere 📢"
-        "Attenzione ⚠ La notifica verrà mandata solo se il giorno successivo sarai in Smart o Ufficio, a seconda del tipo selezionato",
+        "Scegli il tipo di notifica da aggiungere 📢 \n"
+        "Attenzione ⚠ La notifica verrà mandata solo se il giorno successivo sarai in Smart o Ufficio, a seconda del "
+        "tipo selezionato",
         reply_markup=make_keyboard([buttons], context),
     )
 
@@ -154,10 +157,10 @@ def choose_days(update: Update, context: CallbackContext):
 
     callback_data = update.callback_query.data[: update.callback_query.data.index("#")]
     if callback_data == REMIND_SMART_CALLBACK:
-        tmp_notification[SHIFT_TYPE] = ShiftType.SMART_WORKING
+        tmp_notification[SHIFT_TYPE] = ShiftType.SMART_WORKING.value
         tmp_notification[WHEN_TIME] = "19:00"
     elif callback_data == REMIND_OFFICE_CALLBACK:
-        tmp_notification[SHIFT_TYPE] = ShiftType.SMART_WORKING
+        tmp_notification[SHIFT_TYPE] = ShiftType.PRESENCE.value
         tmp_notification[WHEN_TIME] = "18:00"
     elif callback_data in DAYS_OF_WEEK.values():
         when_days = tmp_notification[WHEN_DAYS]
@@ -316,9 +319,6 @@ def notification_key(notification: dict) -> Tuple:
 
 
 def job_time(time):
-    return (
-        datetime.strptime(time, "%H:%M")
-            .replace(tzinfo=tz.tzlocal())
-            # .astimezone(tz.gettz('UTC'))
-            .time()
-    )
+    return (datetime.strptime(datetime.now().strftime("%Y-%m-%d") + " " + time, "%Y-%m-%d %H:%M").replace(
+        tzinfo=tz.gettz('Europe/Rome')).astimezone(tz.gettz('UTC')).time()
+            )

@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 
 from shift.bot import run
 
+# noinspection SpellCheckingInspection
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
 )

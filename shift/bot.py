@@ -46,7 +46,8 @@ shift_users = dict()
 @command
 def start_command(update: Update, context: CallbackContext):
     update.message.reply_text(
-        f"Ciao! Io sono {BOT_NAME}! Con me potrai capire i tuoi turni di presenza senza dover aprire aprire ogni volta email, excel o altri strumenti ormai obsoleti \n\n"
+        f"Ciao! Io sono {BOT_NAME}! Con me potrai capire i tuoi turni di presenza senza dover aprire aprire ogni volta "
+        "email, excel o altri strumenti ormai obsoleti \n\n "
         "Ma prima di iniziare devi effettuare il login, digitando il tuo codice gruppo!",
         reply_markup=make_keyboard(("Login", LOGIN_CALLBACK), context),
     )
@@ -198,6 +199,7 @@ def shifts(update: Update, context: CallbackContext, date: datetime):
         update.callback_query.edit_message_text(text=message, reply_markup=make_keyboard([buttons], context))
 
 
+# noinspection PyUnusedLocal
 @callback
 def cancel_callback(update: Update, context: CallbackContext):
     update.callback_query.delete_message()
@@ -246,11 +248,11 @@ def shift_reminder(context) -> None:
     shift_message = None
     emoji = None
 
-    if shift_type == notifications.ShiftType.SMART_WORKING:
+    if shift_type == notifications.ShiftType.SMART_WORKING.value:
         send_notify = shiftsheduling.is_smart_working_day(compare_date, user_data)
         shift_message = "Smart working"
         emoji = "🏠"
-    elif shift_type == notifications.ShiftType.PRESENCE:
+    elif shift_type == notifications.ShiftType.PRESENCE.value:
         send_notify = shiftsheduling.is_presence_day(compare_date, user_data)
         shift_message = "Ufficio"
         emoji = "💼"

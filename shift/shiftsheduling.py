@@ -43,7 +43,7 @@ def get_current_week_message(date: datetime, user_data: dict):
         message = message + f"{DAYS_OF_WEEK[date.weekday()]} {date_string} - "
         try:
             message = message + f"{get_decoded_description(shifts_dict[user_data[USER_GROUP]][date_string])} \n"
-        except:
+        except KeyError:
             message = message + "Nessun turno 😢\n"
 
     return message
@@ -53,7 +53,7 @@ def is_presence_day(date: datetime, user_data: dict):
     try:
         date_string = date.strftime("%Y-%m-%d")
         return shifts_dict[user_data[USER_GROUP]][date_string] is True
-    except:
+    except KeyError:
         return False
 
 
@@ -61,7 +61,7 @@ def is_smart_working_day(date: datetime, user_data: dict):
     try:
         date_string = date.strftime("%Y-%m-%d")
         return shifts_dict[user_data[USER_GROUP]][date_string] is False
-    except:
+    except KeyError:
         return False
 
 
