@@ -47,7 +47,7 @@ shift_users = dict()
 def start_command(update: Update, context: CallbackContext):
     update.message.reply_text(
         f"Ciao! Io sono {BOT_NAME}! Con me potrai capire i tuoi turni di presenza senza dover aprire aprire ogni volta "
-        "email, excel o altri strumenti ormai obsoleti \n\n "
+        "email, excel o altri strumenti ormai obsoleti \n\n"
         "Ma prima di iniziare devi effettuare il login, digitando il tuo codice gruppo!",
         reply_markup=make_keyboard(("Login", LOGIN_CALLBACK), context),
     )
