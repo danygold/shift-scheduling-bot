@@ -5,7 +5,6 @@ Notification module
 import logging
 import re
 from datetime import datetime
-from enum import Enum
 from typing import Tuple
 
 from dateutil import tz
@@ -17,6 +16,7 @@ from . import shiftsheduling
 from .constants import *
 from .datehelper import DAYS_OF_WEEK
 from .helpers import callback, callback_pattern, logged_user, make_keyboard
+from .shiftsheduling import ShiftType
 
 (
     NOTIFICATION_EXIT_CALLBACK,
@@ -49,14 +49,6 @@ BOT_TAG, USER_ID_TAG, USER_DATA_TAG, SCHEDULE_DATA_TAG = "bot", "user_id", "user
 logger = logging.getLogger(__name__)
 
 notification_jobs = dict()
-
-
-class ShiftType(Enum):
-    """
-    Shift type
-    """
-    SMART_WORKING = 0
-    PRESENCE = 1
 
 
 @logged_user

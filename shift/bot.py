@@ -221,9 +221,9 @@ def tomorrow_command(update: Update, context: CallbackContext):
         when_text = "Domani"
 
     if shiftsheduling.is_smart_working_day(compare_date, context.user_data):
-        message = f"{when_text} sarai in Smart working 🏠"
+        message = f"{when_text} sarai in {shiftsheduling.ShiftType.SMART_WORKING.formatted}"
     elif shiftsheduling.is_presence_day(compare_date, context.user_data):
-        message = f"{when_text} sarai in ufficio 💼"
+        message = f"{when_text} sarai in {shiftsheduling.ShiftType.PRESENCE.formatted}"
     else:
         message = f"Non ci sono turni per {when_text.lower()} 😢"
 
@@ -324,16 +324,13 @@ def shift_reminder(context) -> None:
     compare_date = datetime.datetime.now() + datetime.timedelta(days=1)
 
     shift_message = None
-    emoji = None
 
-    if shift_type == notifications.ShiftType.SMART_WORKING.value:
+    if shift_type == shiftsheduling.ShiftType.SMART_WORKING.value:
         send_notify = shiftsheduling.is_smart_working_day(compare_date, user_data)
-        shift_message = "Smart working"
-        emoji = "🏠"
-    elif shift_type == notifications.ShiftType.PRESENCE.value:
+        shift_message = shiftsheduling.ShiftType.SMART_WORKING.formatted
+    elif shift_type == shiftsheduling.ShiftType.PRESENCE.value:
         send_notify = shiftsheduling.is_presence_day(compare_date, user_data)
-        shift_message = "Ufficio"
-        emoji = "💼"
+        shift_message = shiftsheduling.ShiftType.PRESENCE.formatted
     else:
         send_notify = False
 
@@ -349,9 +346,9 @@ def shift_reminder(context) -> None:
             return
 
         if datetime.datetime.now().weekday() == 5 or datetime.datetime.now() == 6:
-            message = f"Hey. Ricordati che {format_date(compare_date)} sarai in {shift_message} {emoji}"
+            message = f"Hey. Ricordati che {format_date(compare_date)} sarai in {shift_message}"
         else:
-            message = f"Hey. Ricordati che domani sarai in {shift_message} {emoji}"
+            message = f"Hey. Ricordati che domani sarai in {shift_message}"
 
         bot.send_message(chat_id=user_id, text=message)
 

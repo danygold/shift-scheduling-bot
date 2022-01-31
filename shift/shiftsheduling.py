@@ -4,11 +4,71 @@ Shift scheduling module
 
 import datetime
 import json
+from enum import Enum
 
 from .constants import USER_GROUP
 from .datehelper import DAYS_OF_WEEK
 
 shifts_dict = dict()
+
+
+class ShiftType(Enum):
+    """
+    Shift type
+    """
+    SMART_WORKING = 0, "Smart working", "🏠"
+    PRESENCE = 1, "Ufficio", "💼"
+
+    def __new__(cls, *args, **kwds):
+        """
+        Redefine __new__ method
+        :param args: args
+        :param kwds: kwds
+        """
+        obj = object.__new__(cls)
+        obj._value_ = args[0]
+        return obj
+
+    def __init__(self, _: str, description: str = None, emoji: str = None):
+        """
+        Redefine __init__ method. Ignore first parameter because is already set in _value_ in __new__ method
+        :param _:
+        :param description:
+        :param emoji:
+        """
+        self._description_ = description
+        self._emoji_ = emoji
+
+    def __str__(self):
+        """
+        Redefine __str__ method
+        :return: value
+        """
+        return self.value
+
+    @property
+    def description(self):
+        """
+        Description
+        :return: description
+        """
+        return self._description_
+
+    @property
+    def emoji(self):
+        """
+        Emoji
+        :return: emoji
+        """
+        return self._emoji_
+
+    @property
+    def formatted(self):
+        """
+        Formatted text (description + emoji)
+        :return: formatted text
+        """
+        return self._description_ + " " + self._emoji_
 
 
 def load_shifts(file):
@@ -41,9 +101,9 @@ def get_decoded_description(presence: bool):
     :return: decoded description
     """
     if presence:
-        return "Ufficio 💼"
+        return ShiftType.PRESENCE.formatted
     else:
-        return "Smart working 🏠"
+        return ShiftType.SMART_WORKING.formatted
 
 
 def get_week_shifts_message(date: datetime, user_data: dict):
