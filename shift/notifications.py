@@ -269,27 +269,31 @@ def choose_time_wrapper(shift_reminder_callback):
             reminders.append(schedule_data)
             context.user_data[SHIFT_REMINDERS] = reminders
 
-            job = context.job_queue.run_daily(
-                shift_reminder_callback,
-                time=job_time(schedule_data[WHEN_TIME]),
-                days=schedule_data[WHEN_DAYS],
-                context={
-                    BOT_TAG: context.bot,
-                    USER_ID_TAG: user_id,
-                    USER_DATA_TAG: context.user_data,
-                    SCHEDULE_DATA_TAG: schedule_data,
-                },
-            )
+            if len(schedule_data[WHEN_DAYS]) > 0:
+                job = context.job_queue.run_daily(
+                    shift_reminder_callback,
+                    time=job_time(schedule_data[WHEN_TIME]),
+                    days=schedule_data[WHEN_DAYS],
+                    context={
+                        BOT_TAG: context.bot,
+                        USER_ID_TAG: user_id,
+                        USER_DATA_TAG: context.user_data,
+                        SCHEDULE_DATA_TAG: schedule_data,
+                    },
+                )
 
-            logger.info(
-                "Added reminder for user %s (%s): %s",
-                user_id,
-                update.effective_user.first_name,
-                schedule_data,
-            )
-            notification_jobs[(user_id, notification_key(schedule_data))] = job
+                logger.info(
+                    "Added reminder for user %s (%s): %s",
+                    user_id,
+                    update.effective_user.first_name,
+                    schedule_data,
+                )
+                notification_jobs[(user_id, notification_key(schedule_data))] = job
 
-            message = "Notifica aggiunta! ✅"
+                message = "Notifica aggiunta! ✅"
+            else:
+                message = "È necessario selezionare almeno un giorno ⚠"
+
             update.message.reply_text(text=message, reply_markup=keyboard)
 
             context.user_data[INPUT_KIND] = None
@@ -310,21 +314,23 @@ def setup_scheduler(updater: Updater, shift_reminder_callback):
     for user_id, user_values in updater.dispatcher.user_data.items():
         if SHIFT_REMINDERS in user_values:
             for schedule_data in user_values[SHIFT_REMINDERS]:
-                job = updater.job_queue.run_daily(
-                    shift_reminder_callback,
-                    time=job_time(schedule_data[WHEN_TIME]),
-                    days=schedule_data[WHEN_DAYS],
-                    context={
-                        BOT_TAG: updater.bot,
-                        USER_ID_TAG: user_id,
-                        USER_DATA_TAG: user_values,
-                        SCHEDULE_DATA_TAG: schedule_data,
-                    },
-                )
+                # Discard invalid notification (Prevent internal exception)
+                if len(schedule_data[WHEN_DAYS]) > 0:
+                    job = updater.job_queue.run_daily(
+                        shift_reminder_callback,
+                        time=job_time(schedule_data[WHEN_TIME]),
+                        days=schedule_data[WHEN_DAYS],
+                        context={
+                            BOT_TAG: updater.bot,
+                            USER_ID_TAG: user_id,
+                            USER_DATA_TAG: user_values,
+                            SCHEDULE_DATA_TAG: schedule_data,
+                        },
+                    )
 
-                logger.info("Setup reminder for user %s: %s", user_id, schedule_data)
+                    logger.info("Setup reminder for user %s: %s", user_id, schedule_data)
 
-                notification_jobs[(user_id, notification_key(schedule_data))] = job
+                    notification_jobs[(user_id, notification_key(schedule_data))] = job
 
 
 def handlers(shift_reminder_callback):

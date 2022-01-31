@@ -19,11 +19,11 @@ class ShiftType(Enum):
     SMART_WORKING = 0, "Smart working", "🏠"
     PRESENCE = 1, "Ufficio", "💼"
 
-    def __new__(cls, *args, **kwds):
+    def __new__(cls, *args, **kwargs):
         """
         Redefine __new__ method
         :param args: args
-        :param kwds: kwds
+        :param kwargs: kwargs
         """
         obj = object.__new__(cls)
         obj._value_ = args[0]
