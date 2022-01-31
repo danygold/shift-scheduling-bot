@@ -32,9 +32,9 @@ class ShiftType(Enum):
     def __init__(self, _: str, description: str = None, emoji: str = None):
         """
         Redefine __init__ method. Ignore first parameter because is already set in _value_ in __new__ method
-        :param _:
-        :param description:
-        :param emoji:
+        :param _: ignored param
+        :param description: description
+        :param emoji: emoji
         """
         self._description_ = description
         self._emoji_ = emoji
