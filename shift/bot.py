@@ -6,7 +6,7 @@ import datetime
 import logging
 import re
 
-from telegram import Update
+from telegram import Update, ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove
 from telegram.ext import (
     CallbackContext,
     CallbackQueryHandler,
@@ -71,7 +71,8 @@ def login_command(update: Update, context: CallbackContext):
     :param context: context
     """
     context.user_data[INPUT_KIND] = KIND_CREDENTIALS
-    update.message.reply_text(LOGIN_MESSAGE)
+    update.message.reply_text(LOGIN_MESSAGE,
+                              reply_markup=get_keyboard_group_markup())
 
 
 @callback
@@ -82,7 +83,17 @@ def login_callback(update: Update, context: CallbackContext):
     :param context: context
     """
     context.user_data[INPUT_KIND] = KIND_CREDENTIALS
-    update.callback_query.edit_message_text(LOGIN_MESSAGE)
+    update.effective_message.reply_text(LOGIN_MESSAGE,
+                                        reply_markup=get_keyboard_group_markup())
+
+
+def get_keyboard_group_markup():
+    """
+    Get the keyboard group markup
+    :return: ReplyKeyboardMarkup with groups
+    """
+    return ReplyKeyboardMarkup([[KeyboardButton(text=group.strip("GROUP_")) for group in shiftsheduling.shifts_dict]],
+                               resize_keyboard=True)
 
 
 @valid_user
@@ -124,7 +135,8 @@ def credentials_input(update: Update, context: CallbackContext):
         "🔔 *Comandi*: \n\n"
         "/turni - Per visualizzare i tuoi turni 📅\n"
         "/domani - Per visualizzare il turno di domani 🔜\n"
-        "/notifiche - Per impostare gli avvisi 📢"
+        "/notifiche - Per impostare gli avvisi 📢",
+        reply_markup=ReplyKeyboardRemove()
     )
 
 
