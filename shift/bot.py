@@ -40,8 +40,8 @@ KIND_CREDENTIALS = "credentials"
 logger = logging.getLogger(__name__)
 
 LOGIN_MESSAGE = (
-    "Inserisci il tuo gruppo dei turni \n\n"
-    "Questa informazione mi è essenziale per fornirti i turni corretti ️✔"
+    "Inserisci il tuo gruppo dei turni 🔥\n\n"
+    "Questa informazione mi è essenziale per fornirti i turni corretti ️✅"
 )
 
 shift_users = dict()
@@ -54,10 +54,10 @@ def start_command(update: Update, context: CallbackContext):
     :param update: update
     :param context: context
     """
-    update.message.reply_text(
-        f"Ciao! Io sono {get_bot_name()}! Con me potrai capire i tuoi turni di presenza senza dover aprire aprire ogni "
-        "volta email, excel o altri strumenti ormai obsoleti \n\n"
-        "Ma prima di iniziare devi effettuare il login, digitando il tuo codice gruppo!",
+    update.message.reply_markdown(
+        f"👋 Ciao! Io sono *{get_bot_name()}*! Con me potrai capire i tuoi turni di presenza senza dover aprire aprire "
+        "ogni volta email, excel o altri strumenti ormai obsoleti 🔥\n\n"
+        "Ma prima di iniziare devi effettuare il login, digitando il tuo codice gruppo! 😊",
         reply_markup=make_keyboard(("Login", LOGIN_CALLBACK), context),
     )
 
@@ -95,7 +95,7 @@ def credentials_input(update: Update, context: CallbackContext):
     match = re.match(r"[\d]+", update.message.text)
     if not match:
         update.message.reply_markdown(
-            "Il codice gruppo inserito non è in un formato valido\n"
+            "Il codice gruppo inserito non è in un formato valido ⚠\n"
             "Inserisci il codice gruppo di nuovo! 😑"
         )
         return
@@ -103,7 +103,7 @@ def credentials_input(update: Update, context: CallbackContext):
     group = "GROUP_" + update.message.text
     if not shiftsheduling.is_valid_group(group):
         update.message.reply_markdown(
-            "Il codice gruppo inserito non è tra quelli validi\n"
+            "Il codice gruppo inserito non è tra quelli validi ⚠\n"
             "Inserisci il codice gruppo corretto! 😑"
         )
         return
@@ -119,11 +119,12 @@ def credentials_input(update: Update, context: CallbackContext):
         group,
     )
 
-    update.message.reply_text(
-        "Gruppo salvato con successo!\n\n"
-        "Usa /turni per visualizzare i tuoi turni \n"
-        "Use /domani per visualizzare il turno di domani \n"
-        "Usa /notifiche per impostare gli avvisi 📢"
+    update.message.reply_markdown(
+        "Gruppo salvato con successo! 😊\n\n"
+        "🔔 *Comandi*: \n\n"
+        "/turni - Per visualizzare i tuoi turni 📅\n"
+        "/domani - Per visualizzare il turno di domani 🔜\n"
+        "/notifiche - Per impostare gli avvisi 📢"
     )
 
 
@@ -242,8 +243,8 @@ def shifts(update: Update, context: CallbackContext, date: datetime):
         ("Successivo ➡", SHIFTS_NEXT_CALLBACK),
     ]
 
-    message = "Ecco i turni della settimana \n\n" + shiftsheduling.get_week_shifts_message(date,
-                                                                                           context.user_data)
+    message = "Ecco i turni della settimana: \n\n" + shiftsheduling.get_week_shifts_message(date,
+                                                                                            context.user_data)
 
     if update.message:
         update.message.reply_text(text=message, reply_markup=make_keyboard([buttons], context))
