@@ -38,7 +38,8 @@ def make_keyboard(buttons: Union[list, tuple], context: CallbackContext = None, 
             keyboard.append(
                 [
                     InlineKeyboardButton(
-                        text=button[0], callback_data=f"{button[1]}#{session}"
+                        text=button[0],
+                        callback_data=f"{button[1]}#{session}"
                     )
                     for button in row
                 ]
@@ -47,7 +48,8 @@ def make_keyboard(buttons: Union[list, tuple], context: CallbackContext = None, 
         keyboard = [
             [
                 InlineKeyboardButton(
-                    text=buttons[0], callback_data=f"{buttons[1]}#{session}"
+                    text=buttons[0],
+                    callback_data=f"{buttons[1]}#{session}"
                 )
             ]
         ]
@@ -80,10 +82,14 @@ def logged_user(func):
             if update.callback_query:
                 update.callback_query.answer()
                 update.callback_query.edit_message_text(
-                    text=message, reply_markup=keyboard
+                    text=message,
+                    reply_markup=keyboard
                 )
             else:
-                update.message.reply_text(text=message, reply_markup=keyboard)
+                update.message.reply_text(
+                    text=message,
+                    reply_markup=keyboard
+                )
 
     return wrapper
 

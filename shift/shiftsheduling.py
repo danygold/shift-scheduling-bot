@@ -117,11 +117,11 @@ def get_week_shifts_message(date: datetime, user_data: dict):
 
     for date in get_working_date_of_week(date):
         date_string = date.strftime("%Y-%m-%d")
-        message = message + f"{DAYS_OF_WEEK[date.weekday()]} {date_string} - "
+        message += f"{DAYS_OF_WEEK[date.weekday()]} {date_string} - "
         try:
-            message = message + f"{get_decoded_description(shifts_dict[user_data[USER_GROUP]][date_string])} \n"
+            message += f"{get_decoded_description(shifts_dict[user_data[USER_GROUP]][date_string])} \n"
         except KeyError:
-            message = message + "Nessun turno 😢\n"
+            message += "Nessun turno 😢\n"
 
     return message
 

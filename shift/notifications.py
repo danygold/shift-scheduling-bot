@@ -70,9 +70,15 @@ def main_menu(update: Update, context: CallbackContext):
     message = "Attraverso le notifiche ti posso avvertire sui turni che dovrai effettuare 🚨"
 
     if update.message:
-        update.message.reply_text(text=message, reply_markup=keyboard)
+        update.message.reply_text(
+            text=message,
+            reply_markup=keyboard
+        )
     else:
-        update.callback_query.edit_message_text(text=message, reply_markup=keyboard)
+        update.callback_query.edit_message_text(
+            text=message,
+            reply_markup=keyboard
+        )
 
 
 # noinspection PyUnusedLocal
@@ -118,7 +124,10 @@ def remove_callback(update: Update, context: CallbackContext):
         message += f"{i + 1}: {shift_type} alle ore {when_time} nei giorni {when_days}\n"
 
     keyboard = make_keyboard(("Indietro", NOTIFICATION_BACK_CALLBACK), context)
-    update.callback_query.edit_message_text(text=message, reply_markup=keyboard)
+    update.callback_query.edit_message_text(
+        text=message,
+        reply_markup=keyboard
+    )
 
     context.user_data[INPUT_KIND] = KIND_NOTIFICATION_INDEX
 
@@ -153,7 +162,10 @@ def remove_action(update: Update, context: CallbackContext):
     context.user_data[SHIFT_REMINDERS].remove(shift_reminders[index])
 
     keyboard = make_keyboard(("Indietro", NOTIFICATION_BACK_CALLBACK), context)
-    update.message.reply_text(text="Notifica rimossa! ✅", reply_markup=keyboard)
+    update.message.reply_text(
+        text="Notifica rimossa! ✅",
+        reply_markup=keyboard
+    )
 
     context.user_data[INPUT_KIND] = None
 
@@ -228,7 +240,8 @@ def choose_days(update: Update, context: CallbackContext):
         ],
     ]
     update.callback_query.edit_message_text(
-        message, reply_markup=make_keyboard(buttons, context)
+        text=message,
+        reply_markup=make_keyboard(buttons, context)
     )
 
 
@@ -249,10 +262,11 @@ def choose_time_wrapper(shift_reminder_callback):
         keyboard = make_keyboard(("Indietro", NOTIFICATION_BACK_CALLBACK), context)
 
         if update.callback_query:
-            message = (
-                "Inserisci l'orario in cui inviare la notifica, nel formato HH:MM 🕐"
+            message = "Inserisci l'orario in cui inviare la notifica, nel formato HH:MM 🕐"
+            update.callback_query.edit_message_text(
+                text=message,
+                reply_markup=keyboard
             )
-            update.callback_query.edit_message_text(text=message, reply_markup=keyboard)
 
             context.user_data[INPUT_KIND] = KIND_NOTIFICATION_TIME
             return
@@ -294,13 +308,19 @@ def choose_time_wrapper(shift_reminder_callback):
             else:
                 message = "È necessario selezionare almeno un giorno ⚠"
 
-            update.message.reply_text(text=message, reply_markup=keyboard)
+            update.message.reply_text(
+                text=message,
+                reply_markup=keyboard
+            )
 
             context.user_data[INPUT_KIND] = None
             return
 
         message = "L'orario deve essere nel formato HH:MM ⚠️"
-        update.message.reply_text(text=message, reply_markup=keyboard)
+        update.message.reply_text(
+            text=message,
+            reply_markup=keyboard
+        )
 
     return choose_time
 
@@ -399,6 +419,7 @@ def job_time(time):
     :param time: user time
     :return: normalized time
     """
-    return (datetime.strptime(datetime.now().strftime("%Y-%m-%d") + " " + time, "%Y-%m-%d %H:%M").replace(
-        tzinfo=tz.gettz('Europe/Rome')).astimezone(tz.gettz('UTC')).time()
-            )
+    return (
+        datetime.strptime(datetime.now().strftime("%Y-%m-%d") + " " + time, "%Y-%m-%d %H:%M").replace(
+            tzinfo=tz.gettz("Europe/Rome")).astimezone(tz.gettz("UTC")).time()
+    )

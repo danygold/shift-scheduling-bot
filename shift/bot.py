@@ -34,22 +34,20 @@ CANCEL_CALLBACK = "cancel_callback"
 SHIFTS_PREVIOUS_CALLBACK = "shifts_previous_callback"
 SHIFTS_NEXT_CALLBACK = "shifts_next_callback"
 SHIFTS_DATE = "shifts_date"
-
 KIND_CREDENTIALS = "credentials"
-
-logger = logging.getLogger(__name__)
 
 LOGIN_MESSAGE = (
     "Inserisci il tuo gruppo dei turni 🔥\n\n"
     "Questa informazione mi è essenziale per fornirti i turni corretti ️✅"
 )
-
 COMMAND_MESSAGE = (
     "🔔 *Comandi*: \n\n"
     "/turni - Per visualizzare i tuoi turni 📅\n"
     "/domani - Per visualizzare il turno di domani 🔜\n"
     "/notifiche - Per impostare gli avvisi 📢\n"
 )
+
+logger = logging.getLogger(__name__)
 
 shift_users = dict()
 
@@ -85,8 +83,10 @@ def help_command(update: Update, context: CallbackContext):
     if group_code:
         message += f"Hai effettuato l'accesso con il codice gruppo *{group_code.strip(GROUP_PREFIX)}* 😊"
     else:
-        message += "Attualmente non hai ancora fatto l'accesso selezionando il tuo gruppo dei turni." \
-                   "Utilizza il comando /login."
+        message += (
+            "Attualmente non hai ancora fatto l'accesso selezionando il tuo gruppo dei turni."
+            "Utilizza il comando /login."
+        )
         keyboard = make_keyboard(("Login", LOGIN_CALLBACK), context)
 
     update.message.reply_markdown(
@@ -109,8 +109,10 @@ def login_command(update: Update, context: CallbackContext):
     :param context: context
     """
     context.user_data[INPUT_KIND] = KIND_CREDENTIALS
-    update.message.reply_text(LOGIN_MESSAGE,
-                              reply_markup=get_keyboard_group_markup())
+    update.message.reply_text(
+        LOGIN_MESSAGE,
+        reply_markup=get_keyboard_group_markup()
+    )
 
 
 @callback
@@ -121,8 +123,10 @@ def login_callback(update: Update, context: CallbackContext):
     :param context: context
     """
     context.user_data[INPUT_KIND] = KIND_CREDENTIALS
-    update.effective_message.reply_text(LOGIN_MESSAGE,
-                                        reply_markup=get_keyboard_group_markup())
+    update.effective_message.reply_text(
+        LOGIN_MESSAGE,
+        reply_markup=get_keyboard_group_markup()
+    )
 
 
 def get_keyboard_group_markup():
@@ -132,7 +136,8 @@ def get_keyboard_group_markup():
     """
     return ReplyKeyboardMarkup(
         [[KeyboardButton(text=group.strip(GROUP_PREFIX)) for group in shiftsheduling.shifts_dict]],
-        resize_keyboard=True)
+        resize_keyboard=True
+    )
 
 
 @valid_user
@@ -212,9 +217,15 @@ def get_user_group(update: Update, context: CallbackContext):
         keyboard = make_keyboard(("Login", LOGIN_CALLBACK), context)
 
         if update.callback_query:
-            update.callback_query.edit_message_text(text=message, reply_markup=keyboard)
+            update.callback_query.edit_message_text(
+                text=message,
+                reply_markup=keyboard
+            )
         else:
-            update.message.reply_text(text=message, reply_markup=keyboard)
+            update.message.reply_text(
+                text=message,
+                reply_markup=keyboard
+            )
 
     return shift_user
 
@@ -292,13 +303,18 @@ def shifts(update: Update, context: CallbackContext, date: datetime):
         ("Successivo ➡", SHIFTS_NEXT_CALLBACK),
     ]
 
-    message = "Ecco i turni della settimana: \n\n" + shiftsheduling.get_week_shifts_message(date,
-                                                                                            context.user_data)
+    message = "Ecco i turni della settimana: \n\n" + shiftsheduling.get_week_shifts_message(date, context.user_data)
 
     if update.message:
-        update.message.reply_text(text=message, reply_markup=make_keyboard([buttons], context))
+        update.message.reply_text(
+            text=message,
+            reply_markup=make_keyboard([buttons], context)
+        )
     else:
-        update.callback_query.edit_message_text(text=message, reply_markup=make_keyboard([buttons], context))
+        update.callback_query.edit_message_text(
+            text=message,
+            reply_markup=make_keyboard([buttons], context)
+        )
 
 
 # noinspection PyUnusedLocal
@@ -352,7 +368,8 @@ def message_command(update: Update, context: CallbackContext):
 
     for user_id, _ in context.dispatcher.persistence.get_user_data().items():
         context.bot.send_message(
-            chat_id=user_id, text=f"{message}"
+            chat_id=user_id,
+            text=message
         )
 
 
@@ -400,7 +417,10 @@ def shift_reminder(context) -> None:
         else:
             message = f"Hey. Ricordati che domani sarai in {shift_message}"
 
-        bot.send_message(chat_id=user_id, text=message)
+        bot.send_message(
+            chat_id=user_id,
+            text=message
+        )
 
 
 @command
