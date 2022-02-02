@@ -5,6 +5,7 @@ Helper module
 import logging
 import re
 import uuid
+from typing import Union
 
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import CallbackContext
@@ -16,7 +17,7 @@ CALLBACK_SESSION = "callback_session"
 logger = logging.getLogger(__name__)
 
 
-def make_keyboard(buttons, context: CallbackContext = None, user_data: dict = None):
+def make_keyboard(buttons: Union[list, tuple], context: CallbackContext = None, user_data: dict = None):
     """
     Create inline keyboard markup
     :param buttons: buttons to add (Supported type are List of Tuple)
@@ -225,4 +226,4 @@ def callback_pattern(key):
     :param key: key to use
     :return: callback pattern
     """
-    return "^" + key + "#[\w-]+$"
+    return "^" + key + "#[\\w-]+$"

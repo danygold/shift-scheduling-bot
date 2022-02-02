@@ -9,6 +9,7 @@ A Telegram bot that can be used to manage shift scheduling.
 
 ## Commands
 
+- `/aiuto`: display information to help user
 - `/login`: saves the group code to identify user group code in the platform
 - `/turni`: checks the shifts scheduling
 - `/domani`: return the shifts of the next working day

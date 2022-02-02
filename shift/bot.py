@@ -44,6 +44,13 @@ LOGIN_MESSAGE = (
     "Questa informazione mi è essenziale per fornirti i turni corretti ️✅"
 )
 
+COMMAND_MESSAGE = (
+    "🔔 *Comandi*: \n\n"
+    "/turni - Per visualizzare i tuoi turni 📅\n"
+    "/domani - Per visualizzare il turno di domani 🔜\n"
+    "/notifiche - Per impostare gli avvisi 📢\n"
+)
+
 shift_users = dict()
 
 
@@ -59,6 +66,37 @@ def start_command(update: Update, context: CallbackContext):
         "ogni volta email, excel o altri strumenti ormai obsoleti 🔥\n\n"
         "Ma prima di iniziare devi effettuare il login, digitando il tuo codice gruppo! 😊",
         reply_markup=make_keyboard(("Login", LOGIN_CALLBACK), context),
+    )
+
+
+# noinspection PyUnusedLocal
+@command
+def help_command(update: Update, context: CallbackContext):
+    """
+    Manage the /aiuto command
+    :param update: update
+    :param context: context
+    """
+    message = f"🔷 Riepilogo *{get_bot_name()}* \n\n"
+    keyboard = None
+
+    group_code = context.user_data.get(USER_GROUP)
+
+    if group_code:
+        message += f"Hai effettuato l'accesso con il codice gruppo *{group_code.strip(GROUP_PREFIX)}* 😊"
+    else:
+        message += "Attualmente non hai ancora fatto l'accesso selezionando il tuo gruppo dei turni." \
+                   "Utilizza il comando /login."
+        keyboard = make_keyboard(("Login", LOGIN_CALLBACK), context)
+
+    update.message.reply_markdown(
+        message + "\n\n" +
+        "Di seguito trovi l'elenco dei comandi disponibili 🔥\n\n" +
+        COMMAND_MESSAGE +
+        "/aiuto - Per visualizzare questo messaggio 🚑\n\n"
+        "🚑 *Problemi?* \n"
+        "Contatta gli amministratori di sistema, ti sapranno aiutare nel miglior modo possibile 😊",
+        reply_markup=keyboard
     )
 
 
@@ -92,8 +130,9 @@ def get_keyboard_group_markup():
     Get the keyboard group markup
     :return: ReplyKeyboardMarkup with groups
     """
-    return ReplyKeyboardMarkup([[KeyboardButton(text=group.strip("GROUP_")) for group in shiftsheduling.shifts_dict]],
-                               resize_keyboard=True)
+    return ReplyKeyboardMarkup(
+        [[KeyboardButton(text=group.strip(GROUP_PREFIX)) for group in shiftsheduling.shifts_dict]],
+        resize_keyboard=True)
 
 
 @valid_user
@@ -111,7 +150,7 @@ def credentials_input(update: Update, context: CallbackContext):
         )
         return
 
-    group = "GROUP_" + update.message.text
+    group = GROUP_PREFIX + update.message.text
     if not shiftsheduling.is_valid_group(group):
         update.message.reply_markdown(
             "Il codice gruppo inserito non è tra quelli validi ⚠\n"
@@ -131,11 +170,9 @@ def credentials_input(update: Update, context: CallbackContext):
     )
 
     update.message.reply_markdown(
-        "Gruppo salvato con successo! 😊\n\n"
-        "🔔 *Comandi*: \n\n"
-        "/turni - Per visualizzare i tuoi turni 📅\n"
-        "/domani - Per visualizzare il turno di domani 🔜\n"
-        "/notifiche - Per impostare gli avvisi 📢",
+        "Gruppo salvato con successo! 😊\n\n" +
+        COMMAND_MESSAGE +
+        "/aiuto - Per visualizzare la pagina di aiuto 🚑",
         reply_markup=ReplyKeyboardRemove()
     )
 
@@ -382,13 +419,14 @@ def run() -> None:
     Start bot and add all command handler
     """
     data_dir = os.getenv("DATA_DIR") or os.getcwd()
-    persistence = PicklePersistence(filename=os.path.join(data_dir, DB_NAME))
+    persistence = PicklePersistence(filename=os.path.join(data_dir, get_database_name()))
     updater = Updater(os.getenv("TELEGRAM_TOKEN"), persistence=persistence)
 
     dispatcher = updater.dispatcher
 
     handlers = [
                    CommandHandler("start", start_command),
+                   CommandHandler("aiuto", help_command),
                    CommandHandler("login", login_command),
                    CommandHandler("turni", shift_command),
                    CommandHandler("domani", tomorrow_command),
@@ -407,7 +445,7 @@ def run() -> None:
         dispatcher.add_handler(handler)
 
     # Load shifts
-    shiftsheduling.load_shifts(os.path.join(data_dir, SHIFTS_FILENAME))
+    shiftsheduling.load_shifts(os.path.join(data_dir, get_shifts_filename()))
 
     updater.start_polling()
 
