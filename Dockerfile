@@ -1,9 +1,5 @@
 FROM python:3.10
 
-RUN useradd -m shiftuser
-
-USER shiftuser
-
 COPY . /app
 
 WORKDIR /app
