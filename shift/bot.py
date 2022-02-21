@@ -94,7 +94,7 @@ def help_command(update: Update, context: CallbackContext):
             "Di seguito trovi l'elenco dei comandi disponibili 🔥\n\n" +
             COMMAND_MESSAGE +
             "/aiuto - Per visualizzare questo messaggio 🚑\n\n"
-            "🚑 *Problemi?* \n"
+            "🚑 *Problemi?* \n\n"
     )
     if os.getenv("REPOSITORY_URL"):
         message += (
