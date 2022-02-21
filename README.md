@@ -1,17 +1,20 @@
-# shift-scheduling-bot
+# shift-scheduling-bot [![pyhton](https://img.shields.io/badge/python-3.9-blue.svg)](https://www.python.org/downloads/)
+[![release](https://github.com/danygold/shift-scheduling-bot/actions/workflows/release.yml/badge.svg)](https://github.com/danygold/shift-scheduling-bot/actions/workflows/release.yml)
+[![codeql](https://github.com/danygold/shift-scheduling-bot/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/danygold/shift-scheduling-bot/actions/workflows/codeql-analysis.yml)
+[![license](https://img.shields.io/github/license/danygold/shift-scheduling-bot.svg)](https://github.com/danygold/shift-scheduling-bot/blob/master/LICENSE)
 
-A Telegram bot that can be used to manage shift scheduling.
+[Telegram🤖](https://web.telegram.org/) bot to manage and keep track of _shift scheduling_.
 
 ## Features
 
-- See the shift scheduling directly from your smartphone, tablet and all others supported platform of Telegram 🎫
-- Smart notifications to let you know thw following shift 📢
+- See the _shift scheduling_ directly from your smartphone, tablet and all others supported platform of Telegram 🎫
+- Smart notifications to let you know the following shift 📢
 
 ## Commands
 
-- `/aiuto`: display information to help user
-- `/login`: saves the group code to identify user group code in the platform
-- `/turni`: checks the shifts scheduling
-- `/domani`: return the shifts of the next working day
-- `/notifiche`: allows the user to configure notifications
-- `/messaggio`: allows admin users to send a message to all users of the bot
+- `/aiuto` display help information
+- `/login` saves the user group code
+- `/turni` checks the shifts scheduling
+- `/domani` return the shifts of the next working day
+- `/notifiche` allows the user to configure notifications
+- `/messaggio` allows admin users to send a broadcast message to all users
