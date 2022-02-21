@@ -89,13 +89,23 @@ def help_command(update: Update, context: CallbackContext):
         )
         keyboard = make_keyboard(("Login", LOGIN_CALLBACK), context)
 
+    message += (
+            "\n\n" +
+            "Di seguito trovi l'elenco dei comandi disponibili 🔥\n\n" +
+            COMMAND_MESSAGE +
+            "/aiuto - Per visualizzare questo messaggio 🚑\n\n"
+            "🚑 *Problemi?* \n"
+    )
+    if os.getenv("REPOSITORY_URL"):
+        message += (
+            f"[Contatta]({os.getenv('REPOSITORY_URL')}) gli amministratori di sistema, ti sapranno aiutare nel "
+            f"miglior modo possibile 😊 "
+        )
+    else:
+        message += "Contatta gli amministratori di sistema, ti sapranno aiutare nel miglior modo possibile 😊"
+
     update.message.reply_markdown(
-        message + "\n\n" +
-        "Di seguito trovi l'elenco dei comandi disponibili 🔥\n\n" +
-        COMMAND_MESSAGE +
-        "/aiuto - Per visualizzare questo messaggio 🚑\n\n"
-        "🚑 *Problemi?* \n"
-        "Contatta gli amministratori di sistema, ti sapranno aiutare nel miglior modo possibile 😊",
+        message,
         reply_markup=keyboard
     )
 
