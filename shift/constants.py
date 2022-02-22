@@ -5,6 +5,7 @@ This module contains the constants of the application
 import os
 
 LOGIN_CALLBACK = "login_callback"
+REGISTER_CALLBACK = "register_callback"
 INPUT_KIND = "input_kind"
 LOGGED = "logged"
 USER_GROUP = "user_group"

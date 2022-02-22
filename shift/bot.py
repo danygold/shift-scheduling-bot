@@ -6,7 +6,7 @@ import datetime
 import logging
 import re
 
-from telegram import Update, ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove
+from telegram import Update, ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove, ParseMode
 from telegram.ext import (
     CallbackContext,
     CallbackQueryHandler,
@@ -443,6 +443,39 @@ def notification_command(update: Update, context: CallbackContext):
     notifications.main_menu(update, context)
 
 
+@callback
+def register_callback(update: Update, context: CallbackContext):
+    """
+    Register callback action
+    :param update: update
+    :param context: context
+    """
+    context.user_data["registration"] = True
+
+    message = "Richiesta di registrazione inviata. Riceverai una notifica quando la tua richiesta verrà approvata"
+
+    if update.message:
+        update.message.reply_text(
+            text=message,
+            reply_markup=ReplyKeyboardRemove()
+        )
+    else:
+        update.callback_query.edit_message_text(text=message)
+
+    admins = os.getenv("ADMIN_USERS")
+
+    for user_id, _ in context.dispatcher.persistence.get_user_data().items():
+        if "\"" + str(user_id) + "\"" in admins:
+            context.bot.send_message(
+                chat_id=user_id,
+                parse_mode=ParseMode.MARKDOWN,
+                text=(
+                    f"L'utente ```{update.effective_user.id}``` ({update.effective_user.full_name}) ha richiesto "
+                    f"l'utilizzo di {get_bot_name()}"
+                )
+            )
+
+
 def run() -> None:
     """
     Run method.
@@ -466,6 +499,7 @@ def run() -> None:
                    CallbackQueryHandler(cancel_callback, pattern=callback_pattern(CANCEL_CALLBACK)),
                    CallbackQueryHandler(previous_shifts_callback, pattern=callback_pattern(SHIFTS_PREVIOUS_CALLBACK)),
                    CallbackQueryHandler(next_shifts_callback, pattern=callback_pattern(SHIFTS_NEXT_CALLBACK)),
+                   CallbackQueryHandler(register_callback, pattern=callback_pattern(REGISTER_CALLBACK)),
                    MessageHandler(Filters.text & ~Filters.command, user_input),
                ] + notifications.handlers(shift_reminder)
 

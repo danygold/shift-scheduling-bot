@@ -7,7 +7,7 @@ import re
 import uuid
 from typing import Union
 
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardRemove
 from telegram.ext import CallbackContext
 
 from .constants import *
@@ -121,14 +121,25 @@ def valid_user(func):
                 update.effective_user.full_name,
             )
 
-            message = ("Il tuo utente non risulta abilitato all'utilizzo di questo comando\n\n"
-                       f"Se devi effettivamente utilizzare {get_bot_name()} contatta gli amministratori di sistema")
+            if not context.user_data.get("registration"):
+                message = ("Il tuo utente non risulta abilitato all'utilizzo di questo comando\n\n"
+                           f"Per utilizzare {get_bot_name()} richiedi la registrazione attraverso l'apposita opzione.")
+                keyboard = make_keyboard(("Registrami", REGISTER_CALLBACK), context)
+            else:
+                message = "Richiesta di registrazione in attesa di approvazione."
+                keyboard = ReplyKeyboardRemove()
 
             if update.callback_query:
                 update.callback_query.answer()
-                update.callback_query.edit_message_text(text=message)
+                update.callback_query.edit_message_text(
+                    text=message,
+                    reply_markup=keyboard
+                )
             else:
-                update.message.reply_text(text=message)
+                update.message.reply_text(
+                    text=message,
+                    reply_markup=keyboard
+                )
 
             return
 
