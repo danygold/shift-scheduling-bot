@@ -60,7 +60,7 @@ def start_command(update: Update, context: CallbackContext):
     :param context: context
     """
     update.message.reply_markdown(
-        f"👋 Ciao! Io sono *{get_bot_name()}*! Con me potrai capire i tuoi turni di presenza senza dover aprire aprire "
+        f"👋 Ciao! Io sono *{get_bot_name()}*! Con me potrai capire i tuoi turni di presenza senza dover aprire "
         "ogni volta email, excel o altri strumenti ormai obsoleti 🔥\n\n"
         "Ma prima di iniziare devi effettuare il login, digitando il tuo codice gruppo! 😊",
         reply_markup=make_keyboard(("Login", LOGIN_CALLBACK), context),
