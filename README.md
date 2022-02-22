@@ -1,4 +1,4 @@
-# shift-scheduling-bot [![pyhton](https://img.shields.io/badge/python-3.9-blue.svg)](https://www.python.org/downloads/)
+# shift-scheduling-bot [![pyhton](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
 [![release](https://github.com/danygold/shift-scheduling-bot/actions/workflows/release.yml/badge.svg)](https://github.com/danygold/shift-scheduling-bot/actions/workflows/release.yml)
 [![codeql](https://github.com/danygold/shift-scheduling-bot/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/danygold/shift-scheduling-bot/actions/workflows/codeql-analysis.yml)
 [![license](https://img.shields.io/github/license/danygold/shift-scheduling-bot.svg)](https://github.com/danygold/shift-scheduling-bot/blob/master/LICENSE)
