@@ -121,7 +121,7 @@ def valid_user(func):
                 update.effective_user.full_name,
             )
 
-            if not context.user_data.get("registration"):
+            if not context.user_data.get(REGISTRATION):
                 message = ("Il tuo utente non risulta abilitato all'utilizzo di questo comando\n\n"
                            f"Per utilizzare {get_bot_name()} richiedi la registrazione attraverso l'apposita opzione.")
                 keyboard = make_keyboard(("Registrami", REGISTER_CALLBACK), context)

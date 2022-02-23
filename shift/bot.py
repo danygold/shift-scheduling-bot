@@ -449,7 +449,7 @@ def register_callback(update: Update, context: CallbackContext):
     :param update: update
     :param context: context
     """
-    context.user_data["registration"] = True
+    context.user_data[REGISTRATION] = True
 
     message = "Richiesta di registrazione inviata. Riceverai una notifica quando la tua richiesta verrà approvata"
 
