@@ -5,9 +5,11 @@ This module contains the constants of the application
 import os
 
 LOGIN_CALLBACK = "login_callback"
+REGISTER_CALLBACK = "register_callback"
 INPUT_KIND = "input_kind"
 LOGGED = "logged"
 USER_GROUP = "user_group"
+REGISTRATION = "registration"
 BOT_DEFAULT_NAME = "shift-scheduling-bot"
 DB_DEFAULT_NAME = "bot.db"
 SHIFTS_DEFAULT_FILENAME = "shifts.json"
