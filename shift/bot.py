@@ -14,7 +14,7 @@ from telegram.ext import (
     Filters,
     MessageHandler,
     PicklePersistence,
-    Updater,
+    Updater, Dispatcher,
 )
 
 from . import notifications
@@ -35,6 +35,7 @@ SHIFTS_PREVIOUS_CALLBACK = "shifts_previous_callback"
 SHIFTS_NEXT_CALLBACK = "shifts_next_callback"
 SHIFTS_DATE = "shifts_date"
 KIND_CREDENTIALS = "credentials"
+PENDING_APPROVAL = "pending_approval"
 
 LOGIN_MESSAGE = (
     "Inserisci il tuo gruppo dei turni 🔥\n\n"
@@ -48,8 +49,6 @@ COMMAND_MESSAGE = (
 )
 
 logger = logging.getLogger(__name__)
-
-shift_users = dict()
 
 
 @command
@@ -462,6 +461,10 @@ def register_callback(update: Update, context: CallbackContext):
     else:
         update.callback_query.edit_message_text(text=message)
 
+    if context.bot_data.get(PENDING_APPROVAL) is None:
+        context.bot_data[PENDING_APPROVAL] = list()
+    context.bot_data[PENDING_APPROVAL].append(update.effective_user.id)
+
     admins = os.getenv("ADMIN_USERS")
 
     for user_id, _ in context.dispatcher.persistence.get_user_data().items():
@@ -474,6 +477,23 @@ def register_callback(update: Update, context: CallbackContext):
                     f"l'utilizzo di {get_bot_name()}"
                 )
             )
+
+
+def send_approval_notification(dispatcher: Dispatcher):
+    """
+    Send approval notification
+    :param dispatcher: dispatcher
+    """
+    if dispatcher.bot_data.get(PENDING_APPROVAL):
+        for user_id in dispatcher.bot_data[PENDING_APPROVAL]:
+            if "\"" + str(user_id) + "\"" in os.getenv("USERS"):
+                dispatcher.bot_data[PENDING_APPROVAL].remove(user_id)
+                dispatcher.bot.send_message(
+                    chat_id=user_id,
+                    text=(
+                        f"La tua richiesta è stata approvata. Ora potrai utilizzare {get_bot_name()}"
+                    )
+                )
 
 
 def run() -> None:
@@ -510,6 +530,9 @@ def run() -> None:
 
     # Load shifts
     shiftsheduling.load_shifts(os.path.join(data_dir, get_shifts_filename()))
+
+    # Send approval notification
+    send_approval_notification(dispatcher)
 
     updater.start_polling()
 
