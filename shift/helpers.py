@@ -163,11 +163,9 @@ def admin_user(func):
         """
         update = args[0]
 
-        admins = os.getenv("ADMIN_USERS")
-        if not admins:
-            return
+        admins = [int(x.strip()) for x in os.getenv("ADMIN_USERS").split(",")]
 
-        if not "\"" + str(update.message.from_user.id) + "\"" in admins:
+        if update.message.from_user.id not in admins:
             logger.warning(
                 "User %s (%s) try to use an admin command",
                 update.effective_user.id,

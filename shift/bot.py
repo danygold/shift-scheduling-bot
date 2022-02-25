@@ -466,10 +466,10 @@ def register_callback(update: Update, context: CallbackContext):
         context.bot_data[PENDING_APPROVAL] = list()
     context.bot_data[PENDING_APPROVAL].append(update.effective_user.id)
 
-    admins = os.getenv("ADMIN_USERS")
+    admins = [int(x.strip()) for x in os.getenv("ADMIN_USERS").split(",")]
 
     for user_id, _ in context.dispatcher.persistence.get_user_data().items():
-        if "\"" + str(user_id) + "\"" in admins:
+        if user_id in admins:
             context.bot.send_message(
                 chat_id=user_id,
                 parse_mode=ParseMode.MARKDOWN,
@@ -520,13 +520,9 @@ def check_admin_users(dispatcher: Dispatcher):
     if dispatcher.bot_data.get(ENABLED_USERS) is None:
         dispatcher.bot_data[ENABLED_USERS] = set()
 
-    admins = os.getenv("ADMIN_USERS")
-    if admins:
-        users_ids = admins.removeprefix("[").removesuffix("]").split(",")
-        for user_id in users_ids:
-            user_id = user_id.strip("\"").strip("'").strip()
-            if user_id.isdigit():
-                dispatcher.bot_data[ENABLED_USERS].add(int(user_id))
+        admins = [int(x.strip()) for x in os.getenv("ADMIN_USERS").split(",")]
+        for user_id in admins:
+            dispatcher.bot_data[ENABLED_USERS].add(int(user_id))
 
 
 def run() -> None:

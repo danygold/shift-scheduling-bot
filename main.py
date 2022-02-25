@@ -28,7 +28,7 @@ def main():
     if not load_dotenv():
         logger.debug("Failed to load environment variables from .env file")
 
-    required_vars = ["TELEGRAM_TOKEN"]
+    required_vars = ["TELEGRAM_TOKEN", "ADMIN_USERS"]
     for var in required_vars:
         if not os.getenv(var):
             logger.error(f"{var} variable not present")
