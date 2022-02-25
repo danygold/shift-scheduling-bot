@@ -1,1 +1,1 @@
-"""Init. No op"""
+"""Init. No op."""

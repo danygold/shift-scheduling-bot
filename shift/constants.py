@@ -1,4 +1,4 @@
-"""This module contains the constants of the application"""
+"""This module contains the constants of the application."""
 
 import os
 

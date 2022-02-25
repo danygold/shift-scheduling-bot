@@ -1,4 +1,4 @@
-"""This module contains date helper methods"""
+"""This module contains date helper methods."""
 
 import datetime
 

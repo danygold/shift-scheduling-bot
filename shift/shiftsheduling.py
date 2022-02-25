@@ -1,4 +1,4 @@
-"""Shift scheduling module"""
+"""Shift scheduling module."""
 
 import datetime
 import json

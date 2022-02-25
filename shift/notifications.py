@@ -1,4 +1,4 @@
-"""Notification module"""
+"""Notification module."""
 
 import logging
 import re

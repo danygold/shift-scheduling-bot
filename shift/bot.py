@@ -1,4 +1,4 @@
-"""This module contains the bot main commands"""
+"""This module contains the bot main commands."""
 
 import datetime
 import logging
