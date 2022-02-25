@@ -1,6 +1,4 @@
-"""
-This module is the entry point of application
-"""
+"""This module is the entry point of application"""
 
 import logging
 import os

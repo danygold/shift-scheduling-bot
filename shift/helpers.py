@@ -1,6 +1,4 @@
-"""
-Helper module
-"""
+"""Helper module"""
 
 import logging
 import re
