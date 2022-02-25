@@ -7,14 +7,14 @@
 
 ## Features
 
-- See the _shift scheduling_ directly from your smartphone, tablet and all others supported platform of Telegram 🎫
-- Smart notifications to let you know the following shift 📢
+  - See the _shift scheduling_ directly from your smartphone, tablet and all others supported platform of Telegram 🎫
+  - Smart notifications to let you know the following shift 📢
 
 ## Commands
 
-- `/aiuto` display help information
-- `/login` saves the user group code
-- `/turni` checks the shifts scheduling
-- `/domani` return the shifts of the next working day
-- `/notifiche` allows the user to configure notifications
-- `/messaggio` allows admin users to send a broadcast message to all users
+  - `/aiuto` display help information
+  - `/login` saves the user group code
+  - `/turni` checks the shifts scheduling
+  - `/domani` return the shifts of the next working day
+  - `/notifiche` allows the user to configure notifications
+  - `/messaggio` allows admin users to send a broadcast message to all users
