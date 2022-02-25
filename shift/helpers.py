@@ -109,12 +109,12 @@ def valid_user(func):
         """
         update, context = args[0], args[1]
 
-        users = os.getenv("USERS")
+        users = context.bot_data[ENABLED_USERS]
 
         if not users:
             return
 
-        if not "\"" + str(update.message.from_user.id) + "\"" in users:
+        if update.message.from_user.id not in users:
             logger.warning(
                 "User %s (%s) try to use a restricted command",
                 update.effective_user.id,

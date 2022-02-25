@@ -7,7 +7,6 @@ services:
       TELEGRAM_TOKEN: telegram_token_here
       BOT_NAME: bot_name_here
       ADMIN_USERS: admin_users_here
-      USERS: users_here
       DATA_DIR: /data
     restart: unless-stopped
     volumes:

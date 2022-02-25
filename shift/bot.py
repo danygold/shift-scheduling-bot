@@ -31,6 +31,7 @@ from .helpers import (
 )
 
 CANCEL_CALLBACK = "cancel_callback"
+APPROVE_CALLBACK = "approve_callback"
 SHIFTS_PREVIOUS_CALLBACK = "shifts_previous_callback"
 SHIFTS_NEXT_CALLBACK = "shifts_next_callback"
 SHIFTS_DATE = "shifts_date"
@@ -475,25 +476,57 @@ def register_callback(update: Update, context: CallbackContext):
                 text=(
                     f"L'utente ```{update.effective_user.id}``` ({update.effective_user.full_name}) ha richiesto "
                     f"l'utilizzo di {get_bot_name()}"
-                )
+                ),
+                reply_markup=make_keyboard(("Approva", APPROVE_CALLBACK), user_data=context.user_data)
             )
 
 
-def send_approval_notification(dispatcher: Dispatcher):
+def approve_callback(update: Update, context: CallbackContext):
     """
-    Send approval notification
+    Approve action callback.
+    NOTE: This is a special callback because original message is send to another user. DON'T use @callback decorator
+    :param update: update
+    :param context: context
+    """
+    if update.effective_message:
+        m = re.search("<pre>(.*?)</pre>", update.effective_message.text_html)
+
+        user_id = int(m.group(1))
+
+        if user_id in context.bot_data[PENDING_APPROVAL]:
+            context.bot_data[PENDING_APPROVAL].remove(user_id)
+            context.bot_data[ENABLED_USERS].add(user_id)
+            context.bot.send_message(
+                chat_id=user_id,
+                text=(
+                    f"La tua richiesta è stata approvata. Ora potrai utilizzare {get_bot_name()}"
+                )
+            )
+            message = update.effective_message.text_markdown + "\n\nRichiesta approvata"
+        else:
+            message = update.effective_message.text_markdown + "\n\nLa richiesta è già stata approvata"
+
+        if update.message:
+            update.message.reply_markdown(text=message)
+        else:
+            update.callback_query.edit_message_text(text=message, parse_mode=ParseMode.MARKDOWN)
+
+
+def check_admin_users(dispatcher: Dispatcher):
+    """
+    Add ADMIN_USERS users to valid users
     :param dispatcher: dispatcher
     """
-    if dispatcher.bot_data.get(PENDING_APPROVAL):
-        for user_id in dispatcher.bot_data[PENDING_APPROVAL]:
-            if "\"" + str(user_id) + "\"" in os.getenv("USERS"):
-                dispatcher.bot_data[PENDING_APPROVAL].remove(user_id)
-                dispatcher.bot.send_message(
-                    chat_id=user_id,
-                    text=(
-                        f"La tua richiesta è stata approvata. Ora potrai utilizzare {get_bot_name()}"
-                    )
-                )
+    if dispatcher.bot_data.get(ENABLED_USERS) is None:
+        dispatcher.bot_data[ENABLED_USERS] = set()
+
+    admins = os.getenv("ADMIN_USERS")
+    if admins:
+        users_ids = admins.removeprefix("[").removesuffix("]").split(",")
+        for user_id in users_ids:
+            user_id = user_id.strip("\"").strip("'").strip()
+            if user_id.isdigit():
+                dispatcher.bot_data[ENABLED_USERS].add(int(user_id))
 
 
 def run() -> None:
@@ -520,6 +553,7 @@ def run() -> None:
                    CallbackQueryHandler(previous_shifts_callback, pattern=callback_pattern(SHIFTS_PREVIOUS_CALLBACK)),
                    CallbackQueryHandler(next_shifts_callback, pattern=callback_pattern(SHIFTS_NEXT_CALLBACK)),
                    CallbackQueryHandler(register_callback, pattern=callback_pattern(REGISTER_CALLBACK)),
+                   CallbackQueryHandler(approve_callback, pattern=callback_pattern(APPROVE_CALLBACK)),
                    MessageHandler(Filters.text & ~Filters.command, user_input),
                ] + notifications.handlers(shift_reminder)
 
@@ -531,8 +565,8 @@ def run() -> None:
     # Load shifts
     shiftsheduling.load_shifts(os.path.join(data_dir, get_shifts_filename()))
 
-    # Send approval notification
-    send_approval_notification(dispatcher)
+    # Check if all admin users is also in valid users set
+    check_admin_users(dispatcher)
 
     updater.start_polling()
 
